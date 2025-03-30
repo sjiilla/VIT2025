@@ -8,6 +8,8 @@ import pydotplus #if we need to use any external .exe files.... Here we are usin
 import io #For i/o operations
 import pandas as pd
 from sklearn import tree #For Decissin Tree
+import graphviz
+from sklearn.tree import export_graphviz
 
 #Read Train Data file
 titanic_train = pd.read_csv("C:\\Data Science\\Data\\train.csv")
@@ -27,7 +29,18 @@ y_titanic_train = titanic_train['Survived'] #Y-Axis
 dt = tree.DecisionTreeClassifier()
 dt.fit(X_titanic_train, y_titanic_train)
 
-#visualize the decission tree
+# Visualize the decision tree - Option1
+dot_data = export_graphviz(dt, out_file=None, 
+                           feature_names=X_train.columns,  
+                           filled=True, rounded=True,  
+                           special_characters=True)  
+
+# Visualize the decision tree
+graph = graphviz.Source(dot_data)  
+graph.render("decision_tree")  # Saves the tree as a file
+graph.view()  # Opens the file in the default viewer
+
+#visualize the decission tree - Option2
 objStringIO = io.StringIO() 
 tree.export_graphviz(dt, out_file = objStringIO, feature_names = X_titanic_train.columns)
 #Use out_file = objStringIO to getvalues()
