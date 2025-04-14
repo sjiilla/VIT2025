@@ -33,7 +33,7 @@ scaled_data = scaler.transform(X_train)
 print(X_train)
 print(scaled_data)
 
-pca = decomposition.PCA(n_components=2)
+pca = decomposition.PCA(n_components=3)
 pca.fit(X_train)
 
 print(pca.explained_variance_)
@@ -50,8 +50,10 @@ y_train = titanic_train['Survived']
 
 dt = tree.DecisionTreeClassifier()
 
+
 #dt.fit(X_train, y_train) #On original data columns
 dt.fit(transformed_X_train, y_train) #On Transoformed columns
+
 
 titanic_test.info() #Found that one row has Fare = null in test data. Instead of dropping this column, let's take the mean of it.
 titanic_test.Fare[titanic_test['Fare'].isnull()] = titanic_test['Fare'].mean()
@@ -60,12 +62,18 @@ titanic_test.Fare[titanic_test['Fare'].isnull()] = titanic_test['Fare'].mean()
 titanic_test1 = pd.get_dummies(titanic_test,columns=['Pclass', 'Sex', 'Embarked'])
 X_titanic_test = titanic_test1.drop(['PassengerId','Age','Cabin','Ticket', 'Name'],1)
 
-pca = decomposition.PCA(n_components=2)
+scaler = preprocessing.StandardScaler()
+scaler.fit(X_titanic_test)
+scaled_test_data = scaler.transform(X_titanic_test)
+
+
+pca = decomposition.PCA(n_components=3)
 pca.fit(X_titanic_test)
 
-X_transformed_Test = pca.transform(X_titanic_test)
+
+X_transformed_Test = pca.transform(scaled_test_data)
 
 #Apply the model on Furture/test data
 os.getcwd()
 titanic_test['Survived'] = dt.predict(X_transformed_Test)
-titanic_test.to_csv("Submission_PCA2.csv",columns=['PassengerId','Survived'],index=False)
+titanic_test.to_csv("Submission_PCA3.csv",columns=['PassengerId','Survived'],index=False)
